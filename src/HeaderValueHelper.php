@@ -13,18 +13,16 @@ use function explode;
 use function implode;
 use function is_array;
 use function is_string;
-use function mb_strtolower;
 use function mb_strpos;
+use function mb_strtolower;
 use function mb_substr;
 use function preg_match;
-use function preg_split;
 use function preg_replace;
 use function preg_replace_callback;
+use function preg_split;
 use function reset;
 use function rtrim;
 use function strtolower;
-use function strpos;
-use function substr;
 use function trim;
 use function usort;
 
@@ -240,9 +238,7 @@ final class HeaderValueHelper
 
         usort(
             $output,
-            static function (array $a, array $b) {
-                return $b['q'] <=> $a['q'];
-            }
+            static fn(array $a, array $b) => $b['q'] <=> $a['q']
         );
 
         return $output;
@@ -280,7 +276,7 @@ final class HeaderValueHelper
             /** @var string $typeB */
             $typeB = reset($b);
 
-            if (strpos($typeA, '*') === false && strpos($typeB, '*') === false) {
+            if (!str_contains($typeA, '*') && !str_contains($typeB, '*')) {
                 $countA = count($a);
                 $countB = count($b);
                 if ($countA === $countB) {
@@ -291,8 +287,8 @@ final class HeaderValueHelper
                 return $countA > $countB ? -1 : 1;
             }
 
-            $endWildcardA = substr($typeA, -1, 1) === '*';
-            $endWildcardB = substr($typeB, -1, 1) === '*';
+            $endWildcardA = str_ends_with($typeA, '*');
+            $endWildcardB = str_ends_with($typeB, '*');
 
             if (($endWildcardA && !$endWildcardB) || (!$endWildcardA && $endWildcardB)) {
                 // The wildcard ends is the loser.
@@ -300,7 +296,7 @@ final class HeaderValueHelper
             }
 
             // The wildcard starts is the loser.
-            return strpos($typeA, '*') === 0 ? 1 : -1;
+            return str_starts_with($typeA, '*') ? 1 : -1;
         });
 
         foreach ($output as $key => $value) {

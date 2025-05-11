@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Http\Tests;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Http\ContentDispositionHeader;
 
 final class ContentDispositionHeaderTest extends TestCase
 {
-    public function testName(): void
-    {
-        $this->assertSame('Content-Disposition', ContentDispositionHeader::name());
-    }
-
-    public function dataValue(): array
+    public static function dataValue(): array
     {
         return [
             'inlineOnly' => [ContentDispositionHeader::INLINE, null, 'inline'],
@@ -74,13 +70,12 @@ final class ContentDispositionHeaderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataValue
-     *
-     * @param string $type
-     * @param string|null $fileName
-     * @param string $expected
-     */
+    public function testName(): void
+    {
+        $this->assertSame('Content-Disposition', ContentDispositionHeader::name());
+    }
+
+    #[DataProvider('dataValue')]
     public function testValue(string $type, ?string $fileName, string $expected): void
     {
         $this->assertSame($expected, ContentDispositionHeader::value($type, $fileName));

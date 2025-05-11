@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Http\Tests;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Http\HeaderValueHelper;
 
 final class HeaderValueHelperTest extends TestCase
 {
-    public function valueAndParametersDataProvider(): array
+    public static function valueAndParametersDataProvider(): array
     {
         return [
             'empty' => ['', []],
@@ -30,19 +31,7 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider valueAndParametersDataProvider
-     */
-    public function testValueAndParameters(string $input, ?array $expected, ?string $expectedException = null): void
-    {
-        if ($expectedException !== null) {
-            $this->expectException($expectedException);
-        }
-
-        $this->assertSame($expected, HeaderValueHelper::getValueAndParameters($input));
-    }
-
-    public function sortedValuesAndParametersDataProvider(): array
+    public static function sortedValuesAndParametersDataProvider(): array
     {
         return [
             'empty' => ['', []],
@@ -58,15 +47,7 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sortedValuesAndParametersDataProvider
-     */
-    public function testSortedValuesAndParameters($input, array $expected): void
-    {
-        $this->assertSame($expected, HeaderValueHelper::getSortedValueAndParameters($input));
-    }
-
-    public function dataSortedValuesAndParametersInvalidValue(): array
+    public static function dataSortedValuesAndParametersInvalidValue(): array
     {
         $notArrayAndNotString = 'Values are neither array nor string.';
         $notArrayOfStrings = 'Values must be array of strings.';
@@ -79,17 +60,7 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataSortedValuesAndParametersInvalidValue
-     */
-    public function testSortedValuesAndParametersInvalidValue($value, string $message): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($message);
-        HeaderValueHelper::getSortedValueAndParameters($value);
-    }
-
-    public function qFactorSortFailDataProvider(): array
+    public static function qFactorSortFailDataProvider(): array
     {
         return [
             'qTooBig' => ['text/xml;q=1.001', InvalidArgumentException::class],
@@ -101,16 +72,7 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider qFactorSortFailDataProvider
-     */
-    public function testQFactorSortFail($input, string $expected): void
-    {
-        $this->expectException($expected);
-        HeaderValueHelper::getSortedValueAndParameters($input);
-    }
-
-    public function sortedAcceptTypesDataProvider(): array
+    public static function sortedAcceptTypesDataProvider(): array
     {
         return [
             'empty' => ['', []],
@@ -150,15 +112,7 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sortedAcceptTypesDataProvider
-     */
-    public function testSortedAcceptTypes($input, array $expected): void
-    {
-        $this->assertSame($expected, HeaderValueHelper::getSortedAcceptTypes($input));
-    }
-
-    public function getParametersDataProvider(): array
+    public static function getParametersDataProvider(): array
     {
         return [
             'simple' => ['a=test;test=test55', null, null, ['a' => 'test', 'test' => 'test55']],
@@ -217,9 +171,44 @@ final class HeaderValueHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getParametersDataProvider
-     */
+    #[DataProvider('valueAndParametersDataProvider')]
+    public function testValueAndParameters(string $input, ?array $expected, ?string $expectedException = null): void
+    {
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
+        }
+
+        $this->assertSame($expected, HeaderValueHelper::getValueAndParameters($input));
+    }
+
+    #[DataProvider('sortedValuesAndParametersDataProvider')]
+    public function testSortedValuesAndParameters($input, array $expected): void
+    {
+        $this->assertSame($expected, HeaderValueHelper::getSortedValueAndParameters($input));
+    }
+
+    #[DataProvider('dataSortedValuesAndParametersInvalidValue')]
+    public function testSortedValuesAndParametersInvalidValue($value, string $message): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+        HeaderValueHelper::getSortedValueAndParameters($value);
+    }
+
+    #[DataProvider('qFactorSortFailDataProvider')]
+    public function testQFactorSortFail($input, string $expected): void
+    {
+        $this->expectException($expected);
+        HeaderValueHelper::getSortedValueAndParameters($input);
+    }
+
+    #[DataProvider('sortedAcceptTypesDataProvider')]
+    public function testSortedAcceptTypes($input, array $expected): void
+    {
+        $this->assertSame($expected, HeaderValueHelper::getSortedAcceptTypes($input));
+    }
+
+    #[DataProvider('getParametersDataProvider')]
     public function testGetParameters(
         string $input,
         ?bool $lowerCaseParameter,
